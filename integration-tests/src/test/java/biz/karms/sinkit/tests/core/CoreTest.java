@@ -2,7 +2,6 @@ package biz.karms.sinkit.tests.core;
 
 import biz.karms.sinkit.ejb.ArchiveService;
 import biz.karms.sinkit.ejb.CoreService;
-import biz.karms.sinkit.ejb.impl.CoreServiceEJB;
 import biz.karms.sinkit.exception.TooOldIoCException;
 import biz.karms.sinkit.ioc.IoCRecord;
 import biz.karms.sinkit.ioc.IoCSourceIdType;
@@ -87,7 +86,10 @@ public class CoreTest extends Arquillian {
         c.add(Calendar.HOUR, -coreService.getIocActiveHours());
         c.add(Calendar.SECOND, 1);
         Date timeSource = c.getTime();
-        Date receivedByCore = Calendar.getInstance().getTime();
+
+        Calendar c1 = Calendar.getInstance();
+        c1.add(Calendar.MILLISECOND, -1);
+        Date receivedByCore = c1.getTime();
 
         IoCRecord source = IoCFactory.getIoCRecordAsRecieved("sourceTime", "phishing", "phishing.ru", IoCSourceIdType.FQDN, timeObservation, timeSource);
         source = coreService.processIoCRecord(source);
@@ -128,6 +130,8 @@ public class CoreTest extends Arquillian {
         assertTrue(deactivationLimit.after(willNotBeActive.getSeen().getLast()), "Expected seen.last to be before: " + deactivationLimit + ", but was: " + willNotBeActive.getSeen().getLast());
 
         int deactivated = coreService.deactivateIocs();
+
+
         assertTrue(deactivated > 0, "Expecting at least 1 deactivated IoC, but got 0");
         willNotBeActive = archiveService.getIoCRecordById(willNotBeActive.getDocumentId());
         assertFalse(willNotBeActive.isActive(), "Expected not active IoC, but was active");

@@ -5,15 +5,10 @@ import biz.karms.sinkit.ejb.ArchiveService;
 import biz.karms.sinkit.ejb.CacheService;
 import biz.karms.sinkit.ejb.CoreService;
 import biz.karms.sinkit.ejb.impl.ArchiveServiceEJB;
-import biz.karms.sinkit.ejb.impl.CoreServiceEJB;
 import biz.karms.sinkit.ioc.IoCRecord;
 import biz.karms.sinkit.ioc.IoCSourceIdType;
 import biz.karms.sinkit.tests.util.IoCFactory;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.WebRequest;
+import com.gargoylesoftware.htmlunit.*;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -26,9 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.logging.Logger;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * @author Michal Karm Babacek
@@ -261,7 +254,7 @@ public class ApiIntegrationTest extends Arquillian {
         assertEquals(200, page.getWebResponse().getStatusCode());
         String responseBody = page.getWebResponse().getContentAsString();
         LOGGER.info("Response:" + responseBody);
-        String expected = "{\"feed\":{\"url\":\"http://www.greatfeed.com/feed.txt\",\"name\":\"" + feed + "\"},\"description\":{\"text\":\"description\"},\"classification\":{\"type\":\"" + type + "\",\"taxonomy\":\"Fraud\"},\"protocol\":{\"application\":\"ssh\"},\"raw\":\"aHR0cDovL2luZm9ybWF0aW9uLnVwZGF0ZS5teWFjY291bnQtc2VjdXJlLmNvbS85ODI0YTYxOGRlNTlmYjE2MTlmNTUzNTgwYWFmZjcxMS9mMWI2YTE2OTc2MDRiNmI2M2IwODBmODQ2N2FiNGZiNS8\\u003d\",\"source\":{\"id\":{\"value\":\"" + fqdn + "\",\"type\":\"fqdn\"},\"fqdn\":\"" + fqdn + "\",\"asn\":123456,\"asn_name\":\"some_name\",\"geolocation\":{\"cc\":\"RU\",\"city\":\"City\",\"latitude\":85.12645,\"longitude\":-12.9788},\"bgp_prefix\":\"some_prefix\"},\"time\":{\"observation\":\"";
+        String expected = "\"feed\":{\"url\":\"http://www.greatfeed.com/feed.txt\",\"name\":\"" + feed + "\"},\"description\":{\"text\":\"description\"},\"classification\":{\"type\":\"" + type + "\",\"taxonomy\":\"Fraud\"},\"protocol\":{\"application\":\"ssh\"},\"raw\":\"aHR0cDovL2luZm9ybWF0aW9uLnVwZGF0ZS5teWFjY291bnQtc2VjdXJlLmNvbS85ODI0YTYxOGRlNTlmYjE2MTlmNTUzNTgwYWFmZjcxMS9mMWI2YTE2OTc2MDRiNmI2M2IwODBmODQ2N2FiNGZiNS8\\u003d\",\"source\":{\"id\":{\"value\":\"" + fqdn + "\",\"type\":\"fqdn\"},\"fqdn\":\"" + fqdn + "\",\"asn\":123456,\"asn_name\":\"some_name\",\"geolocation\":{\"cc\":\"RU\",\"city\":\"City\",\"latitude\":85.12645,\"longitude\":-12.9788},\"bgp_prefix\":\"some_prefix\"},\"time\":{\"observation\":\"";
         assertTrue(responseBody.contains(expected), "Should have contained " + expected + ", but got: " + responseBody);
     }
 
