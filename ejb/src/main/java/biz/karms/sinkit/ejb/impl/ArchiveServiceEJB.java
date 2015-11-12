@@ -92,8 +92,8 @@ public class ArchiveServiceEJB implements ArchiveService {
                 "           \"filter\": {\n" +
                 "               \"range\": {\n" +
                 "                   \"seen.last\": {\n" +
-                "                       \"lt\": \"now-" + hours + "h\", \n" +
-                "                       \"time_zone\": \"+1:00\"\n" +
+                "                       \"lt\": \"now-" + hours + "h\"" + //, \n" +
+//                "                       \"time_zone\": \"+1:00\"\n" +
                 "                   }\n" +
                 "               }\n" +
                 "           }\n" +
@@ -182,41 +182,6 @@ public class ArchiveServiceEJB implements ArchiveService {
         //IMPORTANT - id has to be computed after the deactivated time is set because it's part of the hash
         ioc.setDocumentId(IoCIdentificationUtils.computeHashedId(ioc));
         ioc = elasticService.index(ioc, ELASTIC_IOC_INDEX, ELASTIC_IOC_TYPE);
-
-
-
-//
-//        String query = "{\n" +
-//                "   \"doc\" : {\n" +
-//                "       \"active\": false,\n" +
-//                "       \"time.deactivated\": \"" +
-//                new SimpleDateFormat(ElasticServiceEJB.TIME_FORMAT).format(deactivated) + "\"" +
-//                "   }\n" +
-//                "}\n";
-//
-//        log.info(query);
-//
-//        JestResult result;
-//        //log.info("Deactivating ioc [" + ioc.toString() + "]");
-//        try {
-//            result =
-//                    elasticService.getElasticClient().execute(
-//                            new Update.Builder(query)
-//                                    .index(ELASTIC_IOC_INDEX)
-//                                    .type(ELASTIC_IOC_TYPE)
-//                                    .id(ioc.getDocumentId())
-//                                    .setParameter(Parameters.REFRESH, true)
-//                                    .build()
-//                    );
-//        } catch (Exception e) {
-//            throw new ArchiveException("IoC deactivation went wrong.", e);
-//        }
-//
-//        if (!result.isSucceeded()) {
-//            log.severe("IoC deactovation wasn't successful: " + result.getErrorMessage());
-//            //log.info(result.getJsonString());
-//            throw new ArchiveException(result.getErrorMessage());
-//        }
 
         return ioc;
     }
