@@ -17,6 +17,7 @@ machine:
     SINKIT_SINKHOLE_IPV6: ::1
     SINKIT_ELASTIC_HOST: localhost
     SINKIT_ELASTIC_PORT: 9200
+    SINKIT_IOC_ACTIVE_HOURS: 72
 dependencies:
   cache_directories:
     - elasticsearch-1.7.1 # relative to the build directory
