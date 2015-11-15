@@ -168,7 +168,7 @@ public class CoreTest extends Arquillian {
     @RunAsClient
     public void cleanElasticTest(@ArquillianResource URL context) throws Exception {
 
-        String index = getLogIndex();
+        String index = IoCFactory.getLogIndex();
 
         WebClient webClient = new WebClient();
         WebRequest requestSettings = new WebRequest(
@@ -207,7 +207,7 @@ public class CoreTest extends Arquillian {
     @RunAsClient
     public void dnsEventLogTestAssert() throws Exception {
 
-        String index = getLogIndex();
+        String index = IoCFactory.getLogIndex();
 
         WebClient webClient = new WebClient();
         WebRequest requestSettings = new WebRequest(new URL(
@@ -274,10 +274,5 @@ public class CoreTest extends Arquillian {
         assertEquals(matchedIoc1.get("source").getAsJsonObject().get("bgp_prefix").getAsString(), "some_prefix");
         assertNotNull(matchedIoc1.get("time").getAsJsonObject().get("observation"));
         assertNotNull(matchedIoc1.get("time").getAsJsonObject().get("received_by_core"));
-    }
-
-    private String getLogIndex() {
-        DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
-        return ArchiveServiceEJB.ELASTIC_LOG_INDEX + "-" + df.format(new Date());
     }
 }
