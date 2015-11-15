@@ -39,6 +39,7 @@ public class ArchiveServiceEJB implements ArchiveService {
     public static final String ELASTIC_LOG_TYPE = "match";
 
     private static final String ELASTIC_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static final DateFormat dateFormatter = new SimpleDateFormat(ELASTIC_DATE_FORMAT);
 
     @Inject
     private Logger log;
@@ -54,32 +55,12 @@ public class ArchiveServiceEJB implements ArchiveService {
     }
 
     @Override
-    public IoCRecord findActiveIoCRecordBySourceId(String sourceId, String classificationType, String feedName) throws ArchiveException {
-//        log.info("searching elastic [ source.id : " + sourceId.replace("\\","\\\\") + ", " +
-//                "classification.type : " + classificationType.replace("\\","\\\\") + ", " +
-//                "feed.name : " + feedName.replace("\\","\\\\") + "]");
-
-        String query = "{\n" +
-                "   \"query\" : {\n" +
-                "       \"filtered\" : {\n" +
-                "           \"query\" : {\n" +
-                "               \"query_string\" : {\n" +
-                "                   \"query\": \"active : true AND source.id.value : \\\"" + sourceId.replace("\\", "\\\\") + "\\\" AND " +
-                "classification.type: \\\"" + classificationType.replace("\\", "\\\\") + "\\\" AND " +
-                "feed.name : \\\"" + feedName.replace("\\", "\\\\") + "\\\"\"\n" +
-                "               }\n" +
-                "           }\n" +
-                "       }\n" +
-                "   }\n" +
-                "}\n";
-
-        return elasticService.searchForSingleHit(query, ELASTIC_IOC_INDEX,
-                ELASTIC_IOC_TYPE, IoCRecord.class);
-    }
-
-    @Override
     public List<IoCRecord> findIoCsForDeactivation(int hours) throws ArchiveException {
         //log.info("Searching archive for active IoCs with seen.last older than " + hours + " hours.");
+
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.HOUR, -hours);
+        String tooOld = dateFormatter.format(c.getTime());
 
         String query = "{\n" +
                 "   \"query\": {\n" +
@@ -92,8 +73,7 @@ public class ArchiveServiceEJB implements ArchiveService {
                 "           \"filter\": {\n" +
                 "               \"range\": {\n" +
                 "                   \"seen.last\": {\n" +
-                "                       \"lt\": \"now-" + hours + "h\"" + //, \n" +
-//                "                       \"time_zone\": \"+1:00\"\n" +
+                "                       \"lt\" : \"" + tooOld + "\"\n" +
                 "                   }\n" +
                 "               }\n" +
                 "           }\n" +
@@ -105,11 +85,6 @@ public class ArchiveServiceEJB implements ArchiveService {
                 ELASTIC_IOC_TYPE, IoCRecord.class);
     }
 
-//    @Override
-//    public IoCRecord archiveIoCRecord(IoCRecord ioc) throws ArchiveException {
-//        return elasticService.index(ioc, ELASTIC_IOC_INDEX, ELASTIC_IOC_TYPE);
-//    }
-
     @Override
     public boolean archiveReceivedIoCRecord(IoCRecord ioc) throws ArchiveException {
 
@@ -118,8 +93,7 @@ public class ArchiveServiceEJB implements ArchiveService {
         //compute uniqueReference
         ioc.setUniqueRef(IoCIdentificationUtils.computeUniqueReference(ioc));
 
-        DateFormat dt = new SimpleDateFormat(ELASTIC_DATE_FORMAT);
-        String seenLast = dt.format(ioc.getSeen().getLast());
+        String seenLast = dateFormatter.format(ioc.getSeen().getLast());
 
         String upsertScript = "{\n" +
                 "    \"script\" : \"ctx._source.seen.last = seenLast\"\n," +
@@ -138,18 +112,6 @@ public class ArchiveServiceEJB implements ArchiveService {
 
     @Override
     public boolean setVirusTotalReportToIoCRecord(IoCRecord ioc, IoCVirusTotalReport[] reports) throws ArchiveException{
-//        String updateScript = "{\n" +
-//                "   \"script\" : {\n" +
-//                "       \"inline\" : \"ctx._source.virus_total_reports += report\",\n" +
-//                "       \"params\" : {\n" +
-//                "           \"report\" : " + new GsonBuilder()
-//                                .setDateFormat(ELASTIC_DATE_FORMAT)
-//                                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-//                                .create()
-//                                .toJson(report) + "\n" +
-//                "       }\n" +
-//                "   }\n" +
-//                "}";
 
         String updateScript = "{\n" +
                 "   \"doc\" : {\n" +
@@ -211,7 +173,7 @@ public class ArchiveServiceEJB implements ArchiveService {
 
     @Override
     public IoCRecord getIoCRecordById(String id) throws ArchiveException {
-        log.log(Level.WARNING, "getIoCRecordById: id: "+id+", ELASTIC_IOC_INDEX: "+ELASTIC_IOC_INDEX+", ELASTIC_IOC_TYPE: "+ELASTIC_IOC_TYPE);
+        //log.log(Level.WARNING, "getIoCRecordById: id: "+id+", ELASTIC_IOC_INDEX: "+ELASTIC_IOC_INDEX+", ELASTIC_IOC_TYPE: "+ELASTIC_IOC_TYPE);
         return elasticService.getDocumentById(id, ELASTIC_IOC_INDEX, ELASTIC_IOC_TYPE, IoCRecord.class);
     }
 

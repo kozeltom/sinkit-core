@@ -48,7 +48,7 @@ public class CoreTest extends Arquillian {
         iocDupl = coreService.processIoCRecord(iocDupl);
         assertEquals(iocDupl.getDocumentId(), ioc.getDocumentId(), "Expected documentId: " + ioc.getDocumentId() + ", but got: " + iocDupl.getDocumentId());
         assertTrue(iocDupl.isActive(), "Expected iocDupl to be active, but got inactive");
-        IoCRecord iocIndexed = archiveService.findActiveIoCRecordBySourceId("phishing.ru", "phishing", "deduplication");
+        IoCRecord iocIndexed = archiveService.getIoCRecordById(iocDupl.getDocumentId());
         assertNotNull(iocIndexed, "Expecting ioc to be found in elastic, but got null");
         assertEquals(iocIndexed.getDocumentId(), ioc.getDocumentId(), "Expexted found document id: " + ioc.getDocumentId() + ", but got: " + iocIndexed.getDocumentId());
         assertEquals(iocIndexed.getSeen().getLast(), lastObservation, "Expected seen.last: " + lastObservation + ", but got: " + iocIndexed.getSeen().getLast());
@@ -112,7 +112,7 @@ public class CoreTest extends Arquillian {
         c.add(Calendar.HOUR, -coreService.getIocActiveHours());
         c.add(Calendar.SECOND, 1);
         Date inactiveDate = c.getTime();
-        c.add(Calendar.SECOND, 5);
+        c.add(Calendar.HOUR, 1);
         Date activeDate = c.getTime();
 
         IoCRecord willNotBeActive = IoCFactory.getIoCRecordAsRecieved("notActive", "phishing", "phishing.ru", IoCSourceIdType.FQDN, inactiveDate, null);
@@ -122,22 +122,19 @@ public class CoreTest extends Arquillian {
         willBeActive = coreService.processIoCRecord(willBeActive);
 
         //wait until the willNotBeActive is too old to be active
-        Thread.sleep(1100);
+        Thread.sleep(2100);
         c = Calendar.getInstance();
         Date now = c.getTime();
         c.add(Calendar.HOUR, -coreService.getIocActiveHours());
         Date deactivationLimit = c.getTime();
         assertTrue(deactivationLimit.after(willNotBeActive.getSeen().getLast()), "Expected seen.last to be before: " + deactivationLimit + ", but was: " + willNotBeActive.getSeen().getLast());
-
         int deactivated = coreService.deactivateIocs();
-
-
         assertTrue(deactivated > 0, "Expecting at least 1 deactivated IoC, but got 0");
-        willNotBeActive = archiveService.getIoCRecordById(willNotBeActive.getDocumentId());
+        willNotBeActive = archiveService.getIoCRecordByUniqueRef(willNotBeActive.getUniqueRef());
         assertFalse(willNotBeActive.isActive(), "Expected not active IoC, but was active");
         assertTrue(deactivationTime.before(willNotBeActive.getTime().getDeactivated()), "Expected time activation to be after: " + deactivationTime + ", but was: " + willNotBeActive.getTime().getDeactivated());
 
-        willBeActive = archiveService.getIoCRecordById(willBeActive.getDocumentId());
+        willBeActive = archiveService.getIoCRecordByUniqueRef(willBeActive.getUniqueRef());
         assertTrue(willBeActive.isActive(), "Expeced active IoC, but was inactive");
     }
 }

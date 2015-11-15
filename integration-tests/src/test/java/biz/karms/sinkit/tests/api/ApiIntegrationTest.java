@@ -115,9 +115,9 @@ public class ApiIntegrationTest extends Arquillian {
         assertTrue(cacheService.addToCache(ioCRecord), "Adding a new IoC to a presumably empty cache failed.");
     }
 
-    @Test(dataProvider = Arquillian.ARQUILLIAN_DATA_PROVIDER, priority = 4)
-    @OperateOnDeployment("ear")
-    @RunAsClient
+//    @Test(dataProvider = Arquillian.ARQUILLIAN_DATA_PROVIDER, priority = 4)
+//    @OperateOnDeployment("ear")
+//    @RunAsClient
     public void getStatsTest(@ArquillianResource URL context) throws Exception {
         WebClient webClient = new WebClient();
         WebRequest requestSettings = new WebRequest(new URL(context + "rest/stats"), HttpMethod.GET);
@@ -264,8 +264,9 @@ public class ApiIntegrationTest extends Arquillian {
         String feed = "integrationTest";
         String type = "phishing";
         String fqdn = "phishing.ru";
+        String iocId = "d056ec334e3c046f0d7fdde6f3d02c8b";  // id hash from values above
 
-        IoCRecord ioc = archiveService.findActiveIoCRecordBySourceId(fqdn, type, feed);
+        IoCRecord ioc = archiveService.getIoCRecordById(iocId);
         assertNotNull(ioc, "Excpecting IoC, but got null with fqdn: " + fqdn + ", type: " + type + ", feed: " + feed);
         assertEquals(ioc.getFeed().getName(), feed, "Expected feed.name: " + feed + ", but got: " + ioc.getFeed().getName());
         assertEquals(ioc.getSource().getId().getType(), IoCSourceIdType.FQDN, "Expected source.id.type: " + IoCSourceIdType.FQDN + ", but got: " + ioc.getSource().getId().getType());
@@ -280,9 +281,9 @@ public class ApiIntegrationTest extends Arquillian {
         assertNotNull(ioc.getTime().getObservation(), "Expecting time.observation, but got null");
     }
 
-    @Test(dataProvider = Arquillian.ARQUILLIAN_DATA_PROVIDER, priority = 11)
-    @OperateOnDeployment("ear")
-    @RunAsClient
+//    @Test(dataProvider = Arquillian.ARQUILLIAN_DATA_PROVIDER, priority = 11)
+//    @OperateOnDeployment("ear")
+//    @RunAsClient
     public void iocInCacheTest(@ArquillianResource URL context) throws Exception {
         WebClient webClient = new WebClient();
         WebRequest requestSettings = new WebRequest(new URL(context + "rest/blacklist/record/phishing.ru"), HttpMethod.GET);
