@@ -13,12 +13,7 @@ import com.google.gson.GsonBuilder;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
-import javax.ejb.Singleton;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
 import javax.inject.Inject;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -150,7 +145,7 @@ public class ArchiveServiceEJB implements ArchiveService {
 
     @Override
     public EventLogRecord archiveEventLogRecord(EventLogRecord logRecord) throws ArchiveException {
-        DateFormat df = new SimpleDateFormat("YYYY.MM.dd");
+        DateFormat df = new SimpleDateFormat("YYYY-MM-dd");
         String index = ELASTIC_LOG_INDEX + "-" + df.format(logRecord.getLogged());
         log.log(Level.FINE, "elasticService.index logging logrecord, index="+index);
         return elasticService.index(logRecord, index, ELASTIC_LOG_TYPE);
