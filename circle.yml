@@ -32,7 +32,7 @@ dependencies:
     - elasticsearch-${ELASTICSEARCH_VERSION} # relative to the build directory
     - wildfly-${WILDFLY_VERSION}
   pre:
-    - if [[ ! -e wildfly-${WILDFLY_VERSION} ]]; then circle-wildfy.sh; fi
+    - if [[ ! -e wildfly-${WILDFLY_VERSION} ]]; then circle-wildfly.sh; fi
     - ${JBOSS_HOME}/bin/standalone.sh -c standalone-ha.xml: {background: true}
     - if [[ ! -e elasticsearch-${ELASTICSEARCH_VERSION} ]]; then wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz && tar -xvf elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz && cp elasticsearch.yml elasticsearch-${ELASTICSEARCH_VERSION}/config/elasticsearch.yml; fi
     - elasticsearch-${ELASTICSEARCH_VERSION}/bin/elasticsearch: {background: true}
