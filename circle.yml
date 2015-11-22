@@ -34,7 +34,7 @@ dependencies:
   pre:
     - if [[ ! -e wildfly-${WILDFLY_VERSION} ]]; then wget http://download.jboss.org/wildfly/${WILDFLY_VERSION}/wildfly-${WILDFLY_VERSION}.zip && \
     unzip wildfly-${WILDFLY_VERSION}.zip && cp standalone-ha.xml ${JBOSS_HOME}/standalone/configuration/standalone-ha.xml
-    ${JBOSS_HOME}/bin/standalone.sh -c standalone-ha.xml
+    - ${JBOSS_HOME}/bin/standalone.sh -c standalone-ha.xml: {background: true}
     - if [[ ! -e elasticsearch-${ELASTICSEARCH_VERSION} ]]; then wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz && tar -xvf elasticsearch-${ELASTICSEARCH_VERSION}.tar.gz && cp elasticsearch.yml elasticsearch-${ELASTICSEARCH_VERSION}/config/elasticsearch.yml; fi
     - elasticsearch-${ELASTICSEARCH_VERSION}/bin/elasticsearch: {background: true}
   override:
