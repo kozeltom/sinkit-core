@@ -31,7 +31,6 @@ machine:
 dependencies:
   cache_directories:
     - elasticsearch-${ELASTICSEARCH_VERSION} # relative to the build directory
-    - ${JBOSS_HOME}
   pre:
     - if [[ ! -e ${JBOSS_HOME} ]]; then chmod 755 circle-wildfly.sh && ./circle-wildfly.sh; fi
     - ${JBOSS_HOME}/bin/standalone.sh -c standalone-ha.xml: {background: true}
