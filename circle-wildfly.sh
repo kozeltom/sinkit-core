@@ -14,9 +14,10 @@ export SINKIT_HOME=$PWD
 #cd wildfly && mvn install -DskipTests
 #cp build/target/wildfly-${WILDFLY_VERSION} ${SINKIT_HOME}/
 wget http://download.jboss.org/wildfly/${WILDFLY_VERSION}/wildfly-${WILDFLY_VERSION}.zip && unzip wildfly-${WILDFLY_VERSION}.zip
-cp ${SINKIT_HOME}/standalone-ha.xml ${SINKIT_HOME}/wildfly-${WILDFLY_VERSION}/standalone/configuration/standalone-ha.xml
+mv wildfly-${WILDFLY_VERSION} ${JBOSS_HOME}
+cp ${SINKIT_HOME}/standalone-ha.xml ${JBOSS_HOME}/standalone/configuration/standalone-ha.xml
 
-export INFINISPAN_MODULE_DIR=${SINKIT_HOME}/wildfly-${WILDFLY_VERSION}/modules/system/layers/base/org/infinispan/query/main/
+export INFINISPAN_MODULE_DIR=${JBOSS_HOME}/modules/system/layers/base/org/infinispan/query/main/
 mkdir -p ${INFINISPAN_MODULE_DIR}
 cp ${SINKIT_HOME}/module.xml ${INFINISPAN_MODULE_DIR}/module.xml
 sed -i "s/@HIBERNATE_HQL_LUCENE_VERSION@/${HIBERNATE_HQL_LUCENE_VERSION}/g" ${INFINISPAN_MODULE_DIR}/module.xml && \
@@ -34,7 +35,7 @@ wget ${MAVEN_CENTRAL}/org/infinispan/infinispan-query-dsl/${VERSION_INFINISPAN}/
 wget ${MAVEN_CENTRAL}/org/infinispan/infinispan-objectfilter/${VERSION_INFINISPAN}/infinispan-objectfilter-${VERSION_INFINISPAN}.jar -O ${INFINISPAN_MODULE_DIR}/infinispan-objectfilter-${VERSION_INFINISPAN}.jar && \
 wget ${MAVEN_CENTRAL}/org/infinispan/infinispan-query/${VERSION_INFINISPAN}/infinispan-query-${VERSION_INFINISPAN}.jar -O ${INFINISPAN_MODULE_DIR}/infinispan-query-${VERSION_INFINISPAN}.jar
 
-export WF_CONFIG=${SINKIT_HOME}/wildfly-${WILDFLY_VERSION}/standalone/configuration/standalone-ha.xml
+export WF_CONFIG=${JBOSS_HOME}/standalone/configuration/standalone-ha.xml
 cp ${SINKIT_HOME}/standalone-ha.xml ${WF_CONFIG}
 
 echo 'JAVA_OPTS="\
@@ -45,7 +46,7 @@ echo 'JAVA_OPTS="\
  -XX:+HeapDumpOnOutOfMemoryError \
  -XX:HeapDumpPath=/opt/sinkit \
  -XX:+UseConcMarkSweepGC \
-"' >> ${SINKIT_HOME}//wildfly-${WILDFLY_VERSION}/bin/standalone.conf
+"' >> ${JBOSS_HOME}/bin/standalone.conf
 
 sed -i "s/@SINKITNIC@/lo/g" ${WF_CONFIG}
 sed -i "s/@SINKITLOGGING@/INFO/g" ${WF_CONFIG}
