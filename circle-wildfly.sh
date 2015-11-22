@@ -46,3 +46,7 @@ echo 'JAVA_OPTS="\
  -XX:HeapDumpPath=/opt/sinkit \
  -XX:+UseConcMarkSweepGC \
 "' >> ${SINKIT_HOME}//wildfly-${WILDFLY_VERSION}/bin/standalone.conf
+
+sed -i "s/@SINKITNIC@/lo/g" ${WF_CONFIG}
+sed -i "s/@SINKITLOGGING@/INFO/g" ${WF_CONFIG}
+sed -i "s/<core-environment>/<core-environment node-identifier=\"circle-node\">/g" ${WF_CONFIG}
